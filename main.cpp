@@ -44,17 +44,18 @@ int main()
     long long mem, examined;
 
     int m{4}, n{3};
-    vector<Car> cars = {
-        Car(2, 0, true),
-        Car(2, 1, false),
-        Car(1, 1, true)};
+    Car c1(2, 0, true);
+    Car c2(2, 1, false);
+    Car c3(1, 1, true);
 
-    vector<pair<int, int>> objects = {
-        make_pair(0, 1),
-        make_pair(2, 2),
-        make_pair(3, 0)};
+    unordered_map<string, Car> cars = {{c1.getKey(), c1}, {c2.getKey(), c2}, {c3.getKey(), c3}};
+    vector<pair<int, int>>
+        objects = {make_pair(0, 1), make_pair(2, 2), make_pair(3, 0)};
 
     Puzzle puzzle(cars, objects, m, n);
 
-    Puzzle *solution = BFS(&puzzle, mem, examined);
+    Puzzle *p = new Puzzle(puzzle);
+    puzzle.goRight(*p, c1);
+
+    // Puzzle *solution = BFS(&puzzle, mem, examined);
 }

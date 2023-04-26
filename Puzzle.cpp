@@ -3,11 +3,11 @@
 
 #include "Puzzle.h"
 
-Puzzle::Puzzle(vector<Car> cars, vector<pair<int, int>> objects, int width, int height)
+Puzzle::Puzzle(unordered_map<string, Car> cars, vector<pair<int, int>> objects, int width, int height)
 {
     this->cars = cars;
     this->width = width;
-    this->height = height;
+
     free = new bool *[height];
     for (int i = 0; i < height; i++)
     {
@@ -16,11 +16,71 @@ Puzzle::Puzzle(vector<Car> cars, vector<pair<int, int>> objects, int width, int 
             free[i][j] = true;
     }
 
-    for (Car car : cars)
-        free[car.getY()][car.getX()] = false;
-
     for (pair<int, int> object : objects)
         free[object.second][object.first] = false;
+
+    for (auto &car : cars)
+        free[car.second.getY()][car.second.getX()] = false;
+
+    auto comparator = [width](Car &c1, Car &c2)
+    { return c1.getY() * width + c1.getX() < c2.getY() * width + c2.getX(); };
+    sort((this->cars).begin(), (this->cars).end(), comparator);
+}
+
+bool Puzzle::goRight(Puzzle &puzzle, Car &car)
+{
+    if (car.getX() >= width - 1 || !puzzle.isFree(car.getX(), car.getY()))
+        return false;
+    puzzle = *this;
+
+    puzzle.setFree(car.getX(), car.getY(), true);
+    puzzle.setFree(car.getX() + 1, car.getY(), false);
+    puzzle.cars[car.getKey()].setX(car.getX() + 1);
+
+    puzzle.setPrevious(this);
+    return true;
+}
+bool Puzzle::goLeft(Puzzle &puzzle, Car &car) {}
+bool Puzzle::goUp(Puzzle &puzzle, Car &car) {}
+bool Puzzle::goDown(Puzzle &puzzle, Car &car) {}
+
+vector<Puzzle *> Puzzle::expand()
+{
+    vector<Puzzle *> children;
+    Puzzle *child;
+
+    for (auto &car : cars)
+    {
+
+        if (car.second.isHorizontal())
+        {
+            child = new Puzzle(*this);
+            if (goRight(*child, car.second))
+                children.push_back(child);
+            else
+                delete child;
+
+            child = new Puzzle(*this);
+            if (goLeft(*child, car.second))
+                children.push_back(child);
+            else
+                delete child;
+        }
+        else
+        {
+            child = new Puzzle(*this);
+            if (goUp(*child, car.second))
+                children.push_back(child);
+            else
+                delete child;
+
+            child = new Puzzle(*this);
+            if (goDown(*child, car.second))
+                children.push_back(child);
+            else
+                delete child;
+        }
+    }
 }
 
 bool Puzzle::isGoal()
@@ -28,19 +88,7 @@ bool Puzzle::isGoal()
     return cars.size() == 0;
 }
 
-vector<Puzzle *> Puzzle::expand()
-{
-}
-
 bool Puzzle::operator==(const Puzzle &p) const
 {
-    sort(cars.begin(), cars.end(), myCompare);
-    // sort(p.cars.begin(), p.cars.end(), myCompare);
     return cars == p.cars;
-}
-
-bool Puzzle::myCompare(Car c1, Car c2)
-{
-    // return c1.getY() * width + c1.getX() < c2.getY() * width + c2.getX();
-    return true;
 }
