@@ -1,6 +1,8 @@
 #ifndef CAR_H
 #define CAR_H
 
+using namespace std;
+
 class Car
 {
 private:
@@ -28,7 +30,10 @@ public:
     int getX() { return x; }
     int getY() { return y; }
     bool isHorizontal() { return horizontal; }
-    string getKey(){};
+    string getKey() const
+    {
+        return to_string(x) + to_string(y) + to_string(horizontal);
+    }
 
     bool operator==(const Car &c) const
     {
@@ -40,6 +45,10 @@ public:
         y = c.y;
         horizontal = c.horizontal;
         return *this;
+    }
+    bool operator<(const Car &c) const
+    {
+        return this->getKey() < c.getKey();
     }
 };
 

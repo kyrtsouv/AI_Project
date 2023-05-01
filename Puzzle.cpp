@@ -3,10 +3,14 @@
 
 #include "Puzzle.h"
 
-Puzzle::Puzzle(unordered_map<string, Car> cars, vector<pair<int, int>> objects, int width, int height)
+Puzzle::Puzzle(vector<Car> cars, vector<pair<int, int>> objects, int width, int height, Puzzle *previous)
 {
     this->cars = cars;
+    this->objects = objects;
     this->width = width;
+    this->height = height;
+    this->previous = previous;
+    sort(cars.begin(), cars.end());
 
     free = new bool *[height];
     for (int i = 0; i < height; i++)
@@ -19,76 +23,115 @@ Puzzle::Puzzle(unordered_map<string, Car> cars, vector<pair<int, int>> objects, 
     for (pair<int, int> object : objects)
         free[object.second][object.first] = false;
 
-    for (auto &car : cars)
-        free[car.second.getY()][car.second.getX()] = false;
+    for (Car car : cars)
+        free[car.getY()][car.getX()] = false;
 
-    auto comparator = [width](Car &c1, Car &c2)
-    { return c1.getY() * width + c1.getX() < c2.getY() * width + c2.getX(); };
-    sort((this->cars).begin(), (this->cars).end(), comparator);
+    key = "";
+    for (Car car : cars)
+        key += car.getKey();
 }
 
-bool Puzzle::goRight(Puzzle &puzzle, Car &car)
+int Puzzle::getDepth()
 {
-    if (car.getX() >= width - 1 || !puzzle.isFree(car.getX(), car.getY()))
-        return false;
-    puzzle = *this;
-
-    puzzle.setFree(car.getX(), car.getY(), true);
-    puzzle.setFree(car.getX() + 1, car.getY(), false);
-    puzzle.cars[car.getKey()].setX(car.getX() + 1);
-
-    puzzle.setPrevious(this);
-    return true;
+    if (previous == NULL)
+        return 0;
+    return previous->getDepth() + 1;
 }
-bool Puzzle::goLeft(Puzzle &puzzle, Car &car) {}
-bool Puzzle::goUp(Puzzle &puzzle, Car &car) {}
-bool Puzzle::goDown(Puzzle &puzzle, Car &car) {}
 
 vector<Puzzle *> Puzzle::expand()
 {
     vector<Puzzle *> children;
     Puzzle *child;
 
-    for (auto &car : cars)
-    {
-
-        if (car.second.isHorizontal())
+    for (int i = 0; i < cars.size(); i++)
+        if (cars[i].isHorizontal())
         {
-            child = new Puzzle(*this);
-            if (goRight(*child, car.second))
+            if (goRight(child, i))
                 children.push_back(child);
-            else
-                delete child;
-
-            child = new Puzzle(*this);
-            if (goLeft(*child, car.second))
+            if (goLeft(child, i))
                 children.push_back(child);
-            else
-                delete child;
         }
         else
         {
-            child = new Puzzle(*this);
-            if (goUp(*child, car.second))
+            if (goUp(child, i))
                 children.push_back(child);
-            else
-                delete child;
-
-            child = new Puzzle(*this);
-            if (goDown(*child, car.second))
+            if (goDown(child, i))
                 children.push_back(child);
-            else
-                delete child;
         }
+
+    return children;
+}
+
+bool Puzzle::goRight(Puzzle *&puzzle, int carIndex)
+{
+    vector<Car> new_cars = this->cars;
+    Car car = new_cars[carIndex];
+
+    if (car.getX() + 1 == width)
+    {
+        new_cars.erase(new_cars.begin() + carIndex);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
     }
+    if (isFree(car.getX() + 1, car.getY()))
+    {
+        new_cars[carIndex].setX(car.getX() + 1);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
+    }
+    return false;
 }
-
-bool Puzzle::isGoal()
+bool Puzzle::goLeft(Puzzle *&puzzle, int carIndex)
 {
-    return cars.size() == 0;
+    vector<Car> new_cars = this->cars;
+    Car car = new_cars[carIndex];
+    if (car.getX() == 0)
+    {
+        new_cars.erase(new_cars.begin() + carIndex);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
+    }
+    if (isFree(car.getX() - 1, car.getY()))
+    {
+        new_cars[carIndex].setX(car.getX() - 1);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
+    }
+    return false;
 }
-
-bool Puzzle::operator==(const Puzzle &p) const
+bool Puzzle::goUp(Puzzle *&puzzle, int carIndex)
 {
-    return cars == p.cars;
+    vector<Car> new_cars = this->cars;
+    Car car = new_cars[carIndex];
+    if (car.getY() == 0)
+    {
+        new_cars.erase(new_cars.begin() + carIndex);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
+    }
+    if (isFree(car.getX(), car.getY() - 1))
+    {
+        new_cars[carIndex].setY(car.getY() - 1);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
+    }
+    return false;
+}
+bool Puzzle::goDown(Puzzle *&puzzle, int carIndex)
+{
+    vector<Car> new_cars = this->cars;
+    Car car = new_cars[carIndex];
+    if (car.getY() == height - 1)
+    {
+        new_cars.erase(new_cars.begin() + carIndex);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
+    }
+    if (isFree(car.getX(), car.getY() + 1))
+    {
+        new_cars[carIndex].setY(car.getY() + 1);
+        puzzle = new Puzzle(new_cars, objects, width, height, this);
+        return true;
+    }
+    return false;
 }

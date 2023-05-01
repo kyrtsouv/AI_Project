@@ -2,8 +2,6 @@
 #define PUZZLE_H
 
 #include <vector>
-#include <unordered_map>
-#include <string>
 
 #include "Car.h"
 
@@ -14,25 +12,29 @@ class Puzzle
 private:
     bool **free;
     int width;
+    int height;
+    string key;
     Puzzle *previous;
-    unordered_map<string, Car> cars;
+    vector<Car> cars;
+    vector<pair<int, int>> objects;
 
 public:
-    Puzzle(unordered_map<string, Car> cars, vector<pair<int, int>> objects, int m, int n);
+    Puzzle(vector<Car> cars, vector<pair<int, int>> objects, int m, int n, Puzzle *previous = NULL);
 
+    void setCars(vector<Car> cars) { this->cars = cars; }
     void setPrevious(Puzzle *p) { previous = p; }
     void setFree(int x, int y, bool value) { free[y][x] = value; }
 
     bool isFree(int x, int y) { return free[y][x]; }
+    bool isGoal() { return cars.empty(); }
+    string getKey() { return key; };
+    int getDepth();
 
     vector<Puzzle *> expand();
-    bool goRight(Puzzle &puzzle, Car &car);
-    bool goLeft(Puzzle &puzzle, Car &car);
-    bool goUp(Puzzle &puzzle, Car &car);
-    bool goDown(Puzzle &puzzle, Car &car);
-
-    bool isGoal();
-    bool operator==(const Puzzle &p) const;
+    bool goRight(Puzzle *&puzzle, int carIndex);
+    bool goLeft(Puzzle *&puzzle, int carIndex);
+    bool goUp(Puzzle *&puzzle, int carIndex);
+    bool goDown(Puzzle *&puzzle, int carIndex);
 };
 
 #endif
