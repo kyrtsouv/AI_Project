@@ -17,7 +17,7 @@ public:
         y = 0;
         horizontal = false;
     }
-    Car(int x, int y, bool horizontal)
+    Car(int x, int y, bool horizontal = true)
     {
         this->x = x;
         this->y = y;

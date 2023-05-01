@@ -43,9 +43,10 @@ Puzzle *BFS(Puzzle *puzzle, long long &mem, long long &examined)
     return nullptr;
 }
 
-#define TEST 2
 int main()
 {
+
+    int TEST = 3;
 
     long long mem, examined;
 
@@ -56,10 +57,7 @@ int main()
     {
         width = 4;
         height = 3;
-        Car c1{2, 0, true};
-        Car c2{2, 1, false};
-        Car c3{1, 1, true};
-        cars = {c1, c2, c3};
+        cars = {{2, 0}, {2, 1, false}, {1, 1}};
         objects = {
             {0, 1}, {2, 2}, {3, 0}};
     }
@@ -67,15 +65,18 @@ int main()
     {
         width = 5;
         height = 5;
-        Car c1{1, 1, false};
-        Car c2{4, 1, true};
-        Car c3{1, 3, true};
-        Car c4{3, 3, false};
-        Car c5{4, 3, false};
-        cars = {c1, c2, c3, c4, c5};
+        cars = {{1, 1, false}, {4, 1}, {1, 3}, {3, 3, false}, {4, 3, false}};
         objects = {
             {1, 0}, {3, 1}, {0, 3}, {4, 4}};
     }
+    if (TEST == 3)
+    {
+        width = 6;
+        height = 6;
+        cars = {{4, 1, false}, {5, 1}, {0, 3, false}, {2, 4}, {3, 4}, {3, 5, false}, {4, 5, false}};
+        objects = {{1, 1}, {5, 3}, {0, 4}};
+    }
+
     Puzzle puzzle(cars, objects, width, height);
 
     Puzzle *solution = BFS(&puzzle, mem, examined);
