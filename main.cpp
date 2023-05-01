@@ -43,22 +43,40 @@ Puzzle *BFS(Puzzle *puzzle, long long &mem, long long &examined)
     return nullptr;
 }
 
+#define TEST 2
 int main()
 {
 
     long long mem, examined;
 
-    int m{4}, n{3};
-    Car c1(2, 0, true);
-    Car c2(2, 1, false);
-    Car c3(1, 1, true);
-
-    vector<Car> cars = {c1, c2, c3};
-    vector<pair<int, int>>
+    int width, height;
+    vector<Car> cars;
+    vector<pair<int, int>> objects;
+    if (TEST == 1)
+    {
+        width = 4;
+        height = 3;
+        Car c1{2, 0, true};
+        Car c2{2, 1, false};
+        Car c3{1, 1, true};
+        cars = {c1, c2, c3};
         objects = {
             {0, 1}, {2, 2}, {3, 0}};
-
-    Puzzle puzzle(cars, objects, m, n);
+    }
+    if (TEST == 2)
+    {
+        width = 5;
+        height = 5;
+        Car c1{1, 1, false};
+        Car c2{4, 1, true};
+        Car c3{1, 3, true};
+        Car c4{3, 3, false};
+        Car c5{4, 3, false};
+        cars = {c1, c2, c3, c4, c5};
+        objects = {
+            {1, 0}, {3, 1}, {0, 3}, {4, 4}};
+    }
+    Puzzle puzzle(cars, objects, width, height);
 
     Puzzle *solution = BFS(&puzzle, mem, examined);
     cout << "BFS: " << endl;
