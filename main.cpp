@@ -46,7 +46,7 @@ Puzzle *BFS(Puzzle *puzzle, long long &mem, long long &examined)
 int main()
 {
 
-    int TEST = 3;
+    int TEST = 2;
 
     long long mem, examined;
 
@@ -80,7 +80,8 @@ int main()
     Puzzle puzzle(cars, objects, width, height);
 
     Puzzle *solution = BFS(&puzzle, mem, examined);
-    cout << "BFS: " << endl;
+    cout << "BFS " << endl
+         << "---" << endl;
     if (solution == nullptr)
         cout << "No solution found" << endl;
     else

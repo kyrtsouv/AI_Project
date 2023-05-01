@@ -39,7 +39,7 @@ public:
     {
         return x == c.x && y == c.y && horizontal == c.horizontal;
     }
-    Car operator=(Car c)
+    Car operator=(const Car &c)
     {
         x = c.x;
         y = c.y;
